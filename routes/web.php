@@ -106,3 +106,48 @@ Route::middleware(['auth', 'wedding.context'])->prefix('workspace')->name('works
     Route::put('/collaborators/members/{id}/permissions', [PartnerCollaborationController::class, 'updatePermissions'])->name('collaborators.permissions');
     Route::post('/switch/{uuid}', [PartnerCollaborationController::class, 'switchWedding'])->name('switch');
 });
+
+/*
+|--------------------------------------------------------------------------
+| CI/CD Auto-Deploy & Database Migration Webhook
+|--------------------------------------------------------------------------
+| Triggered by GitHub Actions after FTP sync to execute migrations & clear cache.
+| Protected by DEPLOY_SECRET token.
+*/
+Route::match(['get', 'post'], '/system/auto-deploy-migrate', function (\Illuminate\Http\Request $request) {
+    $secret = config('app.deploy_secret');
+
+    if (empty($secret) || $request->input('token') !== $secret) {
+        abort(403, 'Unauthorized deploy request.');
+    }
+
+    try {
+        // Run database migrations
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        $migrateOutput = \Illuminate\Support\Facades\Artisan::output();
+
+        // Ensure storage symlink exists
+        try {
+            \Illuminate\Support\Facades\Artisan::call('storage:link');
+        } catch (\Throwable $e) {
+            // symlink may already exist or fail on some hosts
+        }
+
+        // Clear stale config, route, view caches
+        \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+        $clearOutput = \Illuminate\Support\Facades\Artisan::output();
+
+        return response()->json([
+            'status' => 'success',
+            'timestamp' => now()->toIso8601String(),
+            'migrate' => trim($migrateOutput),
+            'optimize' => trim($clearOutput),
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+        ], 500);
+    }
+})->name('system.auto-deploy-migrate');
+

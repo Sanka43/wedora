@@ -58,3 +58,17 @@ jobs:
             phpunit.xml
             README.md
             *.md
+
+      - name: ⚡ Run Migrations & Clear Cache on Host
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          DEPLOY_SECRET: ${{ secrets.DEPLOY_SECRET }}
+        run: |
+          if [ -n "$APP_URL" ] && [ -n "$DEPLOY_SECRET" ]; then
+            echo "Triggering remote database migration and cache clear..."
+            RESPONSE=$(curl -s -L -w "\nHTTP_STATUS:%{http_code}" "$APP_URL/system/auto-deploy-migrate?token=$DEPLOY_SECRET")
+            echo "$RESPONSE"
+          else
+            echo "APP_URL or DEPLOY_SECRET secret is not set yet. Skipping remote migration trigger."
+          fi
+

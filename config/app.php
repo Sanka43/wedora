@@ -123,4 +123,15 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Auto Deployment Secret Token
+    |--------------------------------------------------------------------------
+    |
+    | Secret token used by GitHub Actions CI/CD to trigger automated
+    | database migrations and cache optimizations after deployment.
+    |
+    */
+    'deploy_secret' => env('DEPLOY_SECRET'),
+
 ];
