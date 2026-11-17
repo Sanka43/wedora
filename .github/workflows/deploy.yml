@@ -63,14 +63,14 @@ jobs:
 
       - name: ⚡ Run Migrations & Clear Cache on Host
         env:
-          APP_URL: ${{ secrets.APP_URL }}
-          DEPLOY_SECRET: ${{ secrets.DEPLOY_SECRET }}
+          APP_URL: ${{ secrets.APP_URL || 'https://wedora.rubiksacademy.live' }}
+          DEPLOY_SECRET: ${{ secrets.DEPLOY_SECRET || 'wedora_sec_9f48a1c73e04b68e21908bf' }}
         run: |
-          if [ -n "$APP_URL" ] && [ -n "$DEPLOY_SECRET" ]; then
-            echo "Triggering remote database migration and cache clear..."
-            RESPONSE=$(curl -s -L -w "\nHTTP_STATUS:%{http_code}" "$APP_URL/system/auto-deploy-migrate?token=$DEPLOY_SECRET")
-            echo "$RESPONSE"
-          else
-            echo "APP_URL or DEPLOY_SECRET secret is not set yet. Skipping remote migration trigger."
-          fi
+          echo "Clearing LiteSpeed/PHP OPcache and Laravel view/route caches..."
+          CACHE_RESPONSE=$(curl -s -L -w "\nHTTP_STATUS:%{http_code}" "$APP_URL/system-cache-clear.php?token=$DEPLOY_SECRET")
+          echo "$CACHE_RESPONSE"
+
+          echo "Triggering database migrations and artisan optimizations..."
+          MIGRATE_RESPONSE=$(curl -s -L -w "\nHTTP_STATUS:%{http_code}" "$APP_URL/system/auto-deploy-migrate?token=$DEPLOY_SECRET")
+          echo "$MIGRATE_RESPONSE"
 
