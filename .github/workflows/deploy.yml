@@ -38,8 +38,20 @@ jobs:
           npm ci
           npm run build
 
-      - name: 🚀 Deploy via FTP
+      - name: 🚀 Direct FTP Sync & Cache Purge
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_PORT: ${{ secrets.FTP_PORT || 21 }}
+          APP_URL: ${{ secrets.APP_URL || 'https://wedora.rubiksacademy.live' }}
+          DEPLOY_SECRET: ${{ secrets.DEPLOY_SECRET || 'wedora_sec_9f48a1c73e04b68e21908bf' }}
+        run: |
+          python scripts/deploy_direct.py
+
+      - name: 🚀 Deploy via FTP (Full Action)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        continue-on-error: true
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
