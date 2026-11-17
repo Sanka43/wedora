@@ -1,0 +1,33 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('conversations', function (Blueprint $table) {
+            $table->id();
+            $table->uuid('uuid')->unique();
+            $table->foreignId('wedding_id')->nullable()->constrained('weddings')->onDelete('cascade');
+            $table->foreignId('quotation_id')->nullable()->constrained('quotations')->onDelete('set null');
+            $table->foreignId('booking_id')->nullable()->constrained('bookings')->onDelete('set null');
+            $table->enum('type', ['couple_vendor', 'couple_support', 'vendor_support'])->default('couple_vendor');
+            $table->string('title', 255)->nullable();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('conversations');
+    }
+};
