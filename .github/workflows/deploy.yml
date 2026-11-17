@@ -52,6 +52,7 @@ jobs:
             **/.git*/**
             **/.github*/**
             **/node_modules/**
+            **/vendor/**
             .env
             .env.example
             tests/**
