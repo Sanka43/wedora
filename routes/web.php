@@ -126,6 +126,13 @@ Route::match(['get', 'post'], '/system/auto-deploy-migrate', function (\Illumina
         \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
         $migrateOutput = \Illuminate\Support\Facades\Artisan::output();
 
+        // If requested or if users table is empty, run seeders for initial setup
+        $seedOutput = '';
+        if ($request->boolean('seed') || \App\Models\User::count() === 0) {
+            \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+            $seedOutput = \Illuminate\Support\Facades\Artisan::output();
+        }
+
         // Ensure storage symlink exists
         try {
             \Illuminate\Support\Facades\Artisan::call('storage:link');
