@@ -59,6 +59,7 @@ jobs:
             phpunit.xml
             README.md
             *.md
+            *.zip
 
       - name: ⚡ Run Migrations & Clear Cache on Host
         env:

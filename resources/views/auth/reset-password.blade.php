@@ -1,13 +1,16 @@
 <x-auth-layout>
     <x-slot:title>Update Password — Wedora Sri Lanka</x-slot:title>
 
-    <div class="bg-[#14161f] border border-white/10 rounded-2xl p-8 shadow-2xl gold-border-glow">
+    <div class="bg-white border border-[#ebd9c2] rounded-3xl p-8 sm:p-10 shadow-xl shadow-amber-900/5">
         <div class="text-center mb-6">
-            <h1 class="font-serif-luxury text-2xl sm:text-3xl font-bold text-white mb-2">
+            <div class="w-12 h-12 rounded-2xl gold-gradient-bg mx-auto mb-3 flex items-center justify-center text-[#1a140a] shadow-md border border-amber-300">
+                <span class="text-xl">✨</span>
+            </div>
+            <h1 class="font-serif-luxury text-2xl sm:text-3xl font-bold text-[#241f1a] mb-2">
                 Choose New Password
             </h1>
-            <p class="text-xs sm:text-sm text-slate-400">
-                Please enter your new password to regain access to your account.
+            <p class="text-xs sm:text-sm text-[#665c50]">
+                Please enter your new password to regain access to your wedding account.
             </p>
         </div>
 
@@ -17,35 +20,35 @@
 
             <!-- Email Address -->
             <div>
-                <label for="email" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+                <label for="email" class="block text-xs font-bold uppercase tracking-wider text-[#52483d] mb-1.5">
                     Email Address
                 </label>
                 <input id="email" type="email" name="email" value="{{ old('email', $email) }}" required
-                       class="w-full px-4 py-2.5 bg-[#0c0d12] border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] text-sm transition">
+                       class="w-full px-4 py-2.5 bg-[#faf8f5] border border-[#ebd9c2] rounded-xl text-[#241f1a] placeholder-[#9c9184] focus:outline-none focus:border-[#b8860b] focus:bg-white text-sm transition">
             </div>
 
             <!-- Password -->
             <div>
-                <label for="password" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+                <label for="password" class="block text-xs font-bold uppercase tracking-wider text-[#52483d] mb-1.5">
                     New Password
                 </label>
                 <input id="password" type="password" name="password" required autofocus
-                       class="w-full px-4 py-2.5 bg-[#0c0d12] border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] text-sm transition"
+                       class="w-full px-4 py-2.5 bg-[#faf8f5] border border-[#ebd9c2] rounded-xl text-[#241f1a] placeholder-[#9c9184] focus:outline-none focus:border-[#b8860b] focus:bg-white text-sm transition"
                        placeholder="••••••••">
             </div>
 
             <!-- Confirm Password -->
             <div>
-                <label for="password_confirmation" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+                <label for="password_confirmation" class="block text-xs font-bold uppercase tracking-wider text-[#52483d] mb-1.5">
                     Confirm New Password
                 </label>
                 <input id="password_confirmation" type="password" name="password_confirmation" required
-                       class="w-full px-4 py-2.5 bg-[#0c0d12] border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] text-sm transition"
+                       class="w-full px-4 py-2.5 bg-[#faf8f5] border border-[#ebd9c2] rounded-xl text-[#241f1a] placeholder-[#9c9184] focus:outline-none focus:border-[#b8860b] focus:bg-white text-sm transition"
                        placeholder="••••••••">
             </div>
 
             <!-- Submit -->
-            <button type="submit" class="w-full py-3.5 px-4 rounded-xl gold-gradient-bg text-slate-950 font-bold text-xs uppercase tracking-wider shadow-lg hover:brightness-110 active:scale-[0.99] transition-all">
+            <button type="submit" class="w-full py-3.5 px-4 rounded-xl gold-gradient-bg text-[#1a140a] font-bold text-xs uppercase tracking-wider shadow-md hover:brightness-105 active:scale-[0.99] transition-all border border-amber-300">
                 Update Password & Sign In
             </button>
         </form>

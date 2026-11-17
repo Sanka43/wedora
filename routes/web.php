@@ -122,6 +122,17 @@ Route::match(['get', 'post'], '/system/auto-deploy-migrate', function (\Illumina
     }
 
     try {
+        // Auto-extract vendor.zip if uploaded to cPanel root
+        $vendorZip = base_path('vendor.zip');
+        if (file_exists($vendorZip) && class_exists('ZipArchive')) {
+            $zip = new \ZipArchive;
+            if ($zip->open($vendorZip) === true) {
+                $zip->extractTo(base_path());
+                $zip->close();
+                @unlink($vendorZip);
+            }
+        }
+
         // Run database migrations
         \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
         $migrateOutput = \Illuminate\Support\Facades\Artisan::output();
