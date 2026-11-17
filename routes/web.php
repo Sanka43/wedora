@@ -48,6 +48,26 @@ Route::get('/', function () {
 
 /*
 |--------------------------------------------------------------------------
+| System Cache Clear Helper
+|--------------------------------------------------------------------------
+*/
+Route::get('/clear-cache', function () {
+    try {
+        @array_map('unlink', glob(base_path('bootstrap/cache/*.php')));
+        \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Cache cleared completely!',
+            'db_connection' => config('database.default'),
+            'db_database' => config('database.connections.mysql.database'),
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json(['error' => $e->getMessage()]);
+    }
+});
+
+/*
+|--------------------------------------------------------------------------
 | Authentication Routes
 |--------------------------------------------------------------------------
 */
