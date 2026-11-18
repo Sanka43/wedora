@@ -13,6 +13,16 @@ class UserProfile extends Model
     protected $fillable = [
         'user_id',
         'partner_name',
+        'company_name',
+        'designation',
+        'bio',
+        'experience_years',
+        'specializations',
+        'operating_districts',
+        'website',
+        'instagram_handle',
+        'facebook_url',
+        'address',
         'avatar_url',
         'preferred_locale',
         'notification_preferences',
@@ -21,6 +31,9 @@ class UserProfile extends Model
     protected function casts(): array
     {
         return [
+            'experience_years' => 'integer',
+            'specializations' => 'array',
+            'operating_districts' => 'array',
             'notification_preferences' => 'array',
         ];
     }

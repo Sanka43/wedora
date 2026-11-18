@@ -142,7 +142,7 @@ class PartnerCollaborationController extends Controller
             ->where('invitation_status', InvitationStatus::Accepted)
             ->exists();
 
-        if (!$isMember && !$user->isSuperAdmin()) {
+        if (!$isMember && !$user->isSuperAdmin() && !$user->isPlanner()) {
             abort(403, __('You are not a member of this wedding workspace.'));
         }
 

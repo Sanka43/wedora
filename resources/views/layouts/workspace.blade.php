@@ -1,113 +1,58 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-[#faf8f5]">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-surface scroll-smooth">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'Workspace — Wedora' }}</title>
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('layouts.head-meta')
 </head>
-<body class="min-h-screen bg-[#faf8f5] text-[#241f1a] antialiased selection:bg-[#d8b467] selection:text-[#1a140a] flex flex-col justify-between">
+<body class="min-h-screen bg-surface text-on-surface font-body-md antialiased selection:bg-primary-fixed selection:text-on-primary-fixed flex flex-col justify-between">
 
-    <!-- Top Workspace Navbar -->
-    <header class="sticky top-0 z-50 backdrop-blur-xl bg-white/90 border-b border-[#ebd9c2]">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-20">
-                <!-- Left: Brand & Active Wedding Context -->
-                <div class="flex items-center gap-6">
-                    <a href="{{ route('workspace.dashboard') }}" class="flex items-center gap-3.5 group">
-                        <div class="w-10 h-10 rounded-xl gold-gradient-bg flex items-center justify-center text-[#1a140a] shadow-md shadow-[#c5a059]/20 group-hover:scale-105 transition-transform border border-amber-300">
-                            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                                <path d="M12 2C11.5 3.5 10 5.5 10 7.5c0 1.38.9 2.5 2 2.5s2-1.12 2-2.5C14 5.5 12.5 3.5 12 2z" />
-                                <path d="M12 11c-3.31 0-6 2.69-6 6v1h12v-1c0-3.31-2.69-6-6-6zm-4 5c.55-1.74 2.14-3 4-3s3.45 1.26 4 3H8z" />
-                                <path d="M7 19h10v2H7z" />
-                            </svg>
+    <!-- Top Workspace Navbar with Home Design -->
+    <x-top-navbar>
+        @if(isset($currentWedding) && $currentWedding)
+            <x-slot:subnav>
+                <div class="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-margin">
+                    <div class="flex items-center justify-between py-2 border-t border-outline-variant/20 overflow-x-auto no-scrollbar gap-4 text-xs font-bold">
+                        <!-- Active Wedding Context Indicator -->
+                        <div class="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-primary-fixed/30 border border-primary-fixed text-primary shrink-0">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span class="font-bold">{{ Str::limit($currentWedding->title, 28) }}</span>
+                            <span class="text-primary/50">•</span>
+                            <span class="font-medium text-on-surface-variant">{{ $currentWedding->district }}</span>
                         </div>
-                        <div>
-                            <span class="font-serif-luxury text-xl font-bold tracking-tight text-[#241f1a] flex items-center gap-1">
-                                Wedora<span class="text-[#b8860b]">.</span>
-                            </span>
-                        </div>
-                    </a>
 
-                    <!-- Wedding Workspace Switcher / Badge -->
-                    @if(isset($currentWedding))
-                        <div class="hidden sm:flex items-center gap-3 pl-6 border-l border-[#ebd9c2]">
-                            <div class="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-50 border border-amber-300 text-[#8c6d23] text-xs font-bold">
-                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                <span class="font-bold">{{ $currentWedding->title }}</span>
-                                <span class="text-amber-300">•</span>
-                                <span class="text-[#665c50] font-medium">{{ $currentWedding->district }}</span>
-                            </div>
-                        </div>
-                    @endif
-                </div>
-
-                <!-- Right: Collaboration indicator & User Menu -->
-                <div class="flex items-center gap-4">
-                    <a href="{{ route('workspace.collaborators.index') }}" class="hidden md:inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-[#ebd9c2] hover:border-[#b8860b] bg-white hover:bg-amber-50/50 text-xs font-bold text-[#52483d] transition-all shadow-sm">
-                        <span class="text-[#8c6d23]">👥</span>
-                        <span>Partner & Team</span>
-                    </a>
-
-                    <!-- User Profile Dropdown -->
-                    <div class="flex items-center gap-3 pl-4 border-l border-[#ebd9c2]">
-                        <a href="{{ route('profile.show') }}" class="flex items-center gap-2.5 group">
-                            <div class="w-9 h-9 rounded-full gold-gradient-bg text-[#1a140a] border border-amber-300 flex items-center justify-center text-xs font-bold uppercase group-hover:scale-105 transition-transform shadow-sm">
-                                {{ substr(Auth::user()->name, 0, 1) }}
-                            </div>
-                            <div class="hidden lg:block text-left">
-                                <div class="text-xs font-bold text-[#241f1a] group-hover:text-[#8c6d23] transition-colors">{{ Auth::user()->name }}</div>
-                                <div class="text-[10px] text-[#736657] capitalize font-medium">{{ Auth::user()->role->label() }}</div>
-                            </div>
-                        </a>
-
-                        <form method="POST" action="{{ route('logout') }}" class="inline">
-                            @csrf
-                            <button type="submit" title="Sign Out" class="p-2 rounded-xl text-[#736657] hover:text-rose-700 hover:bg-rose-50 transition-colors">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                                </svg>
-                            </button>
-                        </form>
+                        <!-- Workspace Tabs -->
+                        <nav class="flex items-center gap-4 sm:gap-6 -mb-px shrink-0">
+                            <a href="{{ route('workspace.dashboard') }}" class="py-1.5 border-b-2 {{ request()->routeIs('workspace.dashboard') ? 'border-primary text-primary font-bold' : 'border-transparent text-on-surface-variant hover:text-on-surface' }} flex items-center gap-1.5 transition-colors">
+                                <span>📊</span> Overview
+                            </a>
+                            <a href="{{ route('workspace.collaborators.index') }}" class="py-1.5 border-b-2 {{ request()->routeIs('workspace.collaborators*') ? 'border-primary text-primary font-bold' : 'border-transparent text-on-surface-variant hover:text-on-surface' }} flex items-center gap-1.5 transition-colors">
+                                <span>👥</span> Partner &amp; Team
+                            </a>
+                            <a href="{{ route('home') }}#nekath-preview" class="py-1.5 border-b-2 border-transparent text-on-surface-variant hover:text-on-surface flex items-center gap-1.5 transition-colors">
+                                <span>✅</span> Cultural Checklist
+                            </a>
+                            <a href="{{ route('home') }}#budget-preview" class="py-1.5 border-b-2 border-transparent text-on-surface-variant hover:text-on-surface flex items-center gap-1.5 transition-colors">
+                                <span>💰</span> LKR Budget
+                            </a>
+                            <a href="{{ route('home') }}#rsvp-preview" class="py-1.5 border-b-2 border-transparent text-on-surface-variant hover:text-on-surface flex items-center gap-1.5 transition-colors">
+                                <span>💌</span> Guest Lists &amp; RSVP
+                            </a>
+                            <a href="{{ route('home') }}#marketplace-anchor" class="py-1.5 border-b-2 border-transparent text-on-surface-variant hover:text-on-surface flex items-center gap-1.5 transition-colors">
+                                <span>🏛️</span> Vendor Directory
+                            </a>
+                        </nav>
                     </div>
                 </div>
-            </div>
-
-            <!-- Workspace Sub-navigation Tabs -->
-            @if(isset($currentWedding))
-                <nav class="flex items-center gap-6 -mb-px text-xs font-bold overflow-x-auto no-scrollbar border-t border-[#ebd9c2]/60 pt-2">
-                    <a href="{{ route('workspace.dashboard') }}" class="pb-3 border-b-2 {{ request()->routeIs('workspace.dashboard') ? 'border-[#b8860b] text-[#8c6d23]' : 'border-transparent text-[#736657] hover:text-[#241f1a]' }} flex items-center gap-1.5 transition-colors">
-                        <span>📊</span> Overview
-                    </a>
-                    <a href="{{ route('workspace.collaborators.index') }}" class="pb-3 border-b-2 {{ request()->routeIs('workspace.collaborators*') ? 'border-[#b8860b] text-[#8c6d23]' : 'border-transparent text-[#736657] hover:text-[#241f1a]' }} flex items-center gap-1.5 transition-colors">
-                        <span>👥</span> Partner & Team
-                    </a>
-                    <a href="#checklist" class="pb-3 border-b-2 border-transparent text-[#736657] hover:text-[#241f1a] flex items-center gap-1.5 transition-colors">
-                        <span>✅</span> Cultural Checklist
-                    </a>
-                    <a href="#budget" class="pb-3 border-b-2 border-transparent text-[#736657] hover:text-[#241f1a] flex items-center gap-1.5 transition-colors">
-                        <span>💰</span> LKR Budget
-                    </a>
-                    <a href="#guests" class="pb-3 border-b-2 border-transparent text-[#736657] hover:text-[#241f1a] flex items-center gap-1.5 transition-colors">
-                        <span>💌</span> Guest Lists & RSVP
-                    </a>
-                    <a href="{{ route('home') }}#marketplace" class="pb-3 border-b-2 border-transparent text-[#736657] hover:text-[#241f1a] flex items-center gap-1.5 transition-colors">
-                        <span>🏛️</span> Vendor Directory
-                    </a>
-                </nav>
-            @endif
-        </div>
-    </header>
+            </x-slot:subnav>
+        @endif
+    </x-top-navbar>
 
     <!-- Main Workspace Content -->
-    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 {{ isset($currentWedding) && $currentWedding ? 'pt-36 sm:pt-40' : 'pt-28' }} w-full">
         <!-- Toast Alerts -->
         @if(session('success'))
             <div class="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-300 text-[#8c6d23] text-sm flex items-center justify-between gap-3 shadow-sm">
@@ -149,8 +94,8 @@
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-[#ebd9c2] bg-[#f5f0e8] py-6 text-center text-xs text-[#736657]">
-        &copy; {{ date('Y') }} Wedora Sri Lanka. Luxury Wedding Planning & Verified Vendor Network.
+    <footer class="py-6 border-t border-outline-variant/30 text-center text-xs text-on-surface-variant bg-surface-container-low">
+        &copy; {{ date('Y') }} Wedora Sri Lanka. Connecting couples &amp; verified artisans.
     </footer>
 
 </body>

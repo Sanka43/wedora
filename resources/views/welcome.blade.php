@@ -10,7 +10,7 @@
     <!-- Google Fonts & Material Symbols -->
     <link href="https://fonts.googleapis.com" rel="preconnect">
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400..700;1,400..700&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 
@@ -20,6 +20,7 @@
             body { overscroll-behavior: none; }
             main > :first-child { margin-top: 0 !important; }
             main > :last-child { margin-bottom: 0 !important; }
+            h1, h2, h3, h4, h5, h6 { font-family: 'Cormorant Garamond', Georgia, serif; }
         }
         ::-webkit-scrollbar { display: none; }
     </style>
@@ -102,19 +103,21 @@
                         "title-lg": ["Plus Jakarta Sans", "sans-serif"],
                         "body-lg": ["Plus Jakarta Sans", "sans-serif"],
                         "title-md": ["Plus Jakarta Sans", "sans-serif"],
-                        "display-lg": ["Playfair Display", "serif"],
+                        "display-lg": ["Cormorant Garamond", "Georgia", "serif"],
                         "label-md": ["Plus Jakarta Sans", "sans-serif"],
                         "body-sm": ["Plus Jakarta Sans", "sans-serif"],
-                        "display-lg-mobile": ["Playfair Display", "serif"],
-                        "headline-md": ["Playfair Display", "serif"],
+                        "display-lg-mobile": ["Cormorant Garamond", "Georgia", "serif"],
+                        "headline-md": ["Cormorant Garamond", "Georgia", "serif"],
                         "title-sm": ["Plus Jakarta Sans", "sans-serif"],
-                        "headline-sm": ["Playfair Display", "serif"],
+                        "headline-sm": ["Cormorant Garamond", "Georgia", "serif"],
                         "label-lg": ["Plus Jakarta Sans", "sans-serif"],
                         "body-md": ["Plus Jakarta Sans", "sans-serif"],
                         "label-caps": ["Plus Jakarta Sans", "sans-serif"],
-                        "display-md-mobile": ["Playfair Display", "serif"],
-                        "display-md": ["Playfair Display", "serif"],
-                        "headline-lg": ["Playfair Display", "serif"]
+                        "display-md-mobile": ["Cormorant Garamond", "Georgia", "serif"],
+                        "display-md": ["Cormorant Garamond", "Georgia", "serif"],
+                        "headline-lg": ["Cormorant Garamond", "Georgia", "serif"],
+                        sans: ["Plus Jakarta Sans", "sans-serif"],
+                        serif: ["Cormorant Garamond", "Georgia", "serif"]
                     },
                     fontSize: {
                         "title-lg": ["18px", { lineHeight: "26px", fontWeight: "600" }],
@@ -143,86 +146,30 @@
 </head>
 <body class="bg-surface font-body-md text-on-surface antialiased selection:bg-primary-fixed selection:text-on-primary-fixed">
 
-    <!-- Header Navigation -->
-    <header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
-        <div class="h-20 max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-margin flex items-center justify-between gap-space-lg">
-            <!-- Brand Logo -->
-            <div class="flex items-center gap-space-xl">
-                <a class="flex items-center gap-2 sm:gap-space-sm group focus:outline-none" href="{{ route('home') }}">
-                    <img alt="Wedora Brand Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/ALJJyrDV7FsWCcfDEHeiPW7MvHAp6nWSnVFP5kdtZAQqu_9iK5WoqSmSq1CmmXs-h976EKUVgcE1euMglusBY5jPFKdNUu2PMJaXr7jDdYKjWkYboA-QUQp2eWfF0S9g1-G7niIYl-1EDydQjovM0ph7YqFd9aCgwSW9ZXZVBsl0KEn5ahOPLqP0IvWRg9glp646dQUO89D4_YXPw7UcUWpJ_BhiPl7_36kH_alP8DlrJVPF" onerror="this.onerror=null; this.style.display='none'; document.getElementById('brand-text-logo').classList.remove('hidden');">
-                    <span id="brand-text-logo" class="hidden font-headline-md text-headline-md text-primary font-bold tracking-tight">
-                        Wedora<span class="text-tertiary">.</span>
-                    </span>
-                </a>
+    @php
+        $portalRoute = route('workspace.dashboard');
+        $portalLabel = 'My Workspace';
+        $portalIcon = 'spa';
+        if (auth()->check()) {
+            $u = auth()->user();
+            if ($u->isSuperAdmin()) {
+                $portalRoute = route('admin.dashboard');
+                $portalLabel = 'Control Center';
+                $portalIcon = 'admin_panel_settings';
+            } elseif ($u->isVendor()) {
+                $portalRoute = route('vendor.dashboard');
+                $portalLabel = 'Vendor Portal';
+                $portalIcon = 'storefront';
+            } elseif ($u->isPlanner()) {
+                $portalRoute = route('planner.dashboard');
+                $portalLabel = 'Planner Studio';
+                $portalIcon = 'event_note';
+            }
+        }
+    @endphp
 
-                <!-- Desktop Navigation Links -->
-                <nav class="hidden lg:flex items-center gap-space-lg" data-active-classes="text-primary font-semibold relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:right-0 after:h-0.5 after:bg-primary">
-                    <a aria-current="page" class="transition-colors py-1 text-primary font-semibold relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:right-0 after:h-0.5 after:bg-primary" href="#marketplace-anchor">Marketplace &amp; Vendors</a>
-                    <a class="font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface transition-colors py-1" href="#workspace-preview">Planning Workspace</a>
-                    <a class="font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface transition-colors py-1" href="#nekath-preview">Nekath &amp; Timeline</a>
-                    <a class="font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface transition-colors py-1" href="#budget-preview">Budget &amp; Expenses</a>
-                    <a class="font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface transition-colors py-1" href="#rsvp-preview">RSVP &amp; Guests</a>
-                    @if(isset($plans) && $plans->count())
-                        <a class="font-title-sm text-title-sm text-on-surface-variant hover:text-on-surface transition-colors py-1" href="#pricing-preview">Membership</a>
-                    @endif
-                </nav>
-            </div>
-
-            <!-- Header Actions -->
-            <div class="flex items-center gap-space-sm">
-                @auth
-                    <a class="hidden sm:inline-flex items-center justify-center gap-space-xs px-3.5 py-2 text-on-surface-variant hover:text-on-surface font-title-sm text-title-sm transition-colors" href="{{ route('profile.show') }}">
-                        <span class="material-symbols-outlined text-[18px]">account_circle</span>
-                        <span>{{ Str::limit(auth()->user()->name, 12) }}</span>
-                    </a>
-                    <a class="inline-flex items-center justify-center gap-space-xs px-space-lg py-2.5 rounded-lg bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container transition-all shadow-sm font-title-sm text-title-sm" href="{{ route('workspace.dashboard') }}">
-                        <span class="material-symbols-outlined text-[18px]">spa</span>
-                        <span>Open Workspace</span>
-                    </a>
-                    <form method="POST" action="{{ route('logout') }}" class="inline">
-                        @csrf
-                        <button type="submit" class="hidden sm:inline-flex items-center justify-center p-2 rounded-lg text-on-surface-variant hover:text-error transition-colors" title="Logout">
-                            <span class="material-symbols-outlined text-[18px]">logout</span>
-                        </button>
-                    </form>
-                @else
-                    <a class="hidden sm:inline-flex items-center justify-center px-space-md py-2 text-on-surface-variant hover:text-on-surface font-title-sm text-title-sm transition-colors" href="{{ route('login') }}">
-                        Log In
-                    </a>
-                    <a class="inline-flex items-center justify-center gap-space-xs px-space-lg py-2.5 rounded-lg bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container transition-all shadow-sm font-title-sm text-title-sm" href="{{ route('register') }}">
-                        <span class="material-symbols-outlined text-[18px]">spa</span>
-                        <span>Sign Up Free</span>
-                    </a>
-                @endauth
-
-                <!-- Mobile Menu Button -->
-                <button type="button" id="mobile-menu-btn" class="lg:hidden p-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors focus:outline-none" aria-label="Toggle navigation menu">
-                    <span class="material-symbols-outlined text-[24px]">menu</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Mobile Drawer Navigation -->
-        <div id="mobile-drawer" class="hidden lg:hidden border-t border-outline-variant/40 bg-surface-container-lowest px-4 py-4 space-y-3 shadow-lg">
-            <a class="block py-2 text-primary font-semibold text-title-sm" href="#marketplace-anchor">Marketplace &amp; Vendors</a>
-            <a class="block py-2 text-on-surface-variant hover:text-on-surface text-title-sm" href="#workspace-preview">Planning Workspace</a>
-            <a class="block py-2 text-on-surface-variant hover:text-on-surface text-title-sm" href="#nekath-preview">Nekath &amp; Timeline</a>
-            <a class="block py-2 text-on-surface-variant hover:text-on-surface text-title-sm" href="#budget-preview">Budget &amp; Expenses</a>
-            <a class="block py-2 text-on-surface-variant hover:text-on-surface text-title-sm" href="#rsvp-preview">RSVP &amp; Guests</a>
-            <div class="pt-3 border-t border-outline-variant/30 flex items-center justify-between">
-                @auth
-                    <a href="{{ route('workspace.dashboard') }}" class="font-title-sm text-primary font-semibold">My Wedding Workspace</a>
-                    <form method="POST" action="{{ route('logout') }}" class="inline">
-                        @csrf
-                        <button type="submit" class="text-xs text-error font-semibold">Sign Out</button>
-                    </form>
-                @else
-                    <a href="{{ route('login') }}" class="font-title-sm text-on-surface-variant font-semibold">Sign In</a>
-                    <a href="{{ route('register') }}" class="font-title-sm text-primary font-bold">Register Nuptials</a>
-                @endauth
-            </div>
-        </div>
-    </header>
+    <!-- Top Navigation Bar -->
+    <x-top-navbar />
 
     <main class="w-full pt-20 bg-surface min-h-[calc(100vh-80px)]">
         <div class="flex flex-col w-full">
@@ -253,9 +200,9 @@
                                 </a>
 
                                 @auth
-                                    <a class="inline-flex items-center justify-center gap-space-xs px-space-xl py-3.5 rounded-lg bg-surface-container-lowest text-on-background hover:bg-surface-container transition-all shadow-sm font-title-sm text-title-sm" href="{{ route('workspace.dashboard') }}">
-                                        <span class="material-symbols-outlined text-[18px] text-tertiary">spa</span>
-                                        <span>Open Workspace</span>
+                                    <a class="inline-flex items-center justify-center gap-space-xs px-space-xl py-3.5 rounded-lg bg-surface-container-lowest text-on-background hover:bg-surface-container transition-all shadow-sm font-title-sm text-title-sm" href="{{ $portalRoute }}">
+                                        <span class="material-symbols-outlined text-[18px] text-tertiary">{{ $portalIcon }}</span>
+                                        <span>{{ $portalLabel }}</span>
                                     </a>
                                 @else
                                     <a class="inline-flex items-center justify-center gap-space-xs px-space-xl py-3.5 rounded-lg bg-surface-container-lowest text-on-background hover:bg-surface-container transition-all shadow-sm font-title-sm text-title-sm" href="{{ route('register') }}">
@@ -433,263 +380,73 @@
 
                 <!-- Vendor Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-xl" id="vendor-cards-grid">
-                    <!-- Card 1: Shangri-La Grand Ballroom -->
-                    <article class="vendor-card group bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all flex flex-col justify-between border border-outline-variant/20" data-category="venues" data-district="colombo">
-                        <div>
-                            <div class="relative aspect-[16/10] overflow-hidden bg-surface-container">
-                                <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Opulent grand wedding ballroom at Shangri-La Colombo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmJ6sX6uqukygxYx8D509G4qdlGY2a7M4Gz1npj6BPM2UN-AkI80MMRGH7DauRP02ZBa4hVuvChP1TNHQyoi3R7zQzo44BR-cg50LzARVBA44fiJrxH-0FoOJIItwXBpvMmMt90R8bVW9DZtLThP9sJDit-x37q2YV8d6Sb5T3Ptp8Ik2k4T6LRvX-MqRhuPOzWYTt1T0w5mXh5-dntVfBqtdBVZqBWs8M_HcaJ8lL">
-                                <div class="absolute top-3 left-3 flex gap-1">
-                                    <span class="px-2.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-label-caps text-label-caps font-bold uppercase tracking-wider shadow-sm">Featured Atelier</span>
-                                </div>
-                                <div class="absolute top-3 right-3 px-2 py-0.5 rounded bg-surface-container-lowest/90 backdrop-blur font-title-sm text-title-sm text-on-surface flex items-center gap-1 shadow-sm">
-                                    <span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
-                                    <span>5.0</span>
-                                    <span class="text-on-surface-variant font-body-sm text-body-sm">(184)</span>
-                                </div>
-                            </div>
-                            <div class="p-space-lg flex flex-col">
-                                <div class="flex items-center justify-between mb-1">
-                                    <span class="font-label-caps text-label-caps text-primary uppercase tracking-wider">Venues &amp; Ballrooms</span>
-                                    <div class="flex items-center gap-1 text-on-surface-variant font-body-sm text-body-sm">
-                                        <span class="material-symbols-outlined text-[14px]">location_on</span>
-                                        <span>Colombo 03</span>
+                    @forelse($featuredVendors as $vendor)
+                        @php
+                            $catSlug = match(strtolower($vendor->category?->slug ?? '')) {
+                                'venues' => 'venues',
+                                'photography' => 'photo',
+                                'poruwa' => 'poruwa',
+                                'attire' => 'bridal',
+                                default => strtolower($vendor->category?->slug ?? 'venues'),
+                            };
+                            $coverUrl = $vendor->coverMedia?->file_url ?? ($vendor->media->first()?->file_url ?? 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80');
+                        @endphp
+                        <article class="vendor-card group bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all flex flex-col justify-between border border-outline-variant/20" data-category="{{ $catSlug }}" data-district="{{ strtolower($vendor->district ?? 'colombo') }}">
+                            <div>
+                                <a href="{{ route('vendors.show', $vendor->slug) }}" class="block relative aspect-[16/10] overflow-hidden bg-surface-container">
+                                    <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="{{ $vendor->business_name }}" src="{{ $coverUrl }}">
+                                    <div class="absolute top-3 left-3 flex gap-1">
+                                        @if($vendor->is_featured)
+                                            <span class="px-2.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-label-caps text-label-caps font-bold uppercase tracking-wider shadow-sm">Featured Atelier</span>
+                                        @else
+                                            <span class="px-2.5 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed-variant font-label-caps text-label-caps font-bold uppercase tracking-wider shadow-sm">Verified Atelier</span>
+                                        @endif
+                                    </div>
+                                    <div class="absolute top-3 right-3 px-2 py-0.5 rounded bg-surface-container-lowest/90 backdrop-blur font-title-sm text-title-sm text-on-surface flex items-center gap-1 shadow-sm">
+                                        <span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
+                                        <span>{{ number_format($vendor->rating_avg, 1) }}</span>
+                                        <span class="text-on-surface-variant font-body-sm text-body-sm">({{ $vendor->reviews_count }})</span>
+                                    </div>
+                                </a>
+                                <div class="p-space-lg flex flex-col">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <span class="font-label-caps text-label-caps text-primary uppercase tracking-wider">{{ $vendor->category?->name ?? 'Wedding Atelier' }}</span>
+                                        <div class="flex items-center gap-1 text-on-surface-variant font-body-sm text-body-sm">
+                                            <span class="material-symbols-outlined text-[14px]">location_on</span>
+                                            <span>{{ $vendor->district ?: 'Colombo' }}</span>
+                                        </div>
+                                    </div>
+                                    <a href="{{ route('vendors.show', $vendor->slug) }}" class="group-hover:text-primary transition-colors">
+                                        <h3 class="font-headline-sm text-headline-sm text-on-background group-hover:text-primary transition-colors">{{ $vendor->business_name }}</h3>
+                                    </a>
+                                    <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 line-clamp-2">{{ $vendor->description }}</p>
+                                    <div class="flex flex-wrap gap-1.5 mt-space-md">
+                                        @forelse($vendor->packages->take(3) as $pkg)
+                                            <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md">{{ $pkg->name }}</span>
+                                        @empty
+                                            <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md">Bespoke Inquiries</span>
+                                        @endforelse
                                     </div>
                                 </div>
-                                <h3 class="font-headline-sm text-headline-sm text-on-background group-hover:text-primary transition-colors">Shangri-La Colombo Grand Ballroom</h3>
-                                <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 line-clamp-2">Pillar-less banquet sanctuary overlooking Galle Face Green and the Indian Ocean with dedicated bridal salons.</p>
-                                <div class="flex flex-wrap gap-1.5 mt-space-md">
-                                    <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md">Ballroom</span>
-                                    <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md">Poruwa Setups</span>
-                                    <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md">Ocean View</span>
-                                </div>
                             </div>
+                            <div class="px-space-lg pb-space-lg pt-space-sm flex items-center justify-between bg-surface-container-low/40 border-t border-outline-variant/10">
+                                <div class="flex flex-col">
+                                    <span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Starting from</span>
+                                    <span class="font-title-lg text-title-lg text-on-background font-bold tracking-tight">LKR {{ number_format($vendor->starting_price) }}</span>
+                                </div>
+                                <button class="quote-btn px-space-md py-2 rounded-lg bg-surface text-on-surface hover:bg-on-background hover:text-surface transition-all font-title-sm text-title-sm shadow-sm flex items-center gap-1 cursor-pointer" data-vendor="{{ $vendor->business_name }}" type="button">
+                                    <span>Quick Quote</span>
+                                    <span class="material-symbols-outlined text-[16px]">send</span>
+                                </button>
+                            </div>
+                        </article>
+                    @empty
+                        <div class="col-span-full p-12 text-center bg-surface-container-lowest rounded-xl border border-outline-variant/20">
+                            <span class="material-symbols-outlined text-4xl text-on-surface-variant/40 mb-2">storefront</span>
+                            <h3 class="font-headline-sm text-on-surface">No Featured Ateliers Currently Listed</h3>
+                            <p class="font-body-sm text-on-surface-variant mt-1">Our curated vendor directory will update shortly as verified artisans finalize onboarding.</p>
                         </div>
-                        <div class="px-space-lg pb-space-lg pt-space-sm flex items-center justify-between bg-surface-container-low/40 border-t border-outline-variant/10">
-                            <div class="flex flex-col">
-                                <span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Starting from</span>
-                                <span class="font-title-lg text-title-lg text-on-background font-bold tracking-tight">LKR 850,000</span>
-                            </div>
-                            <button class="quote-btn px-space-md py-2 rounded-lg bg-surface text-on-surface hover:bg-on-background hover:text-surface transition-all font-title-sm text-title-sm shadow-sm flex items-center gap-1 cursor-pointer" data-vendor="Shangri-La Colombo Grand Ballroom" type="button">
-                                <span>Quick Quote</span>
-                                <span class="material-symbols-outlined text-[16px]">send</span>
-                            </button>
-                        </div>
-                    </article>
-
-                    <!-- Card 2: Dhanushka Senanayake Photography -->
-                    <article class="vendor-card group bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all flex flex-col justify-between border border-outline-variant/20" data-category="photo" data-district="colombo">
-                        <div>
-                            <div class="relative aspect-[16/10] overflow-hidden bg-surface-container">
-                                <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Candid editorial portrait of a joyful Sri Lankan couple during Poruwa ceremony" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNqsCB0yjT21Rcr7gaR2phbZK4M-1JvtQnhDtIoP1hQCjk-GuYZ7WofEfFQ5c1JBnNtmwL5hA7ursRJBAzjEXlm0YZAo2_FlkWlXrljQuwhAsaoz3RJaT5JVu5CBdK4CL7xawOipyQt4o6pVxoCt6wiIA4FoRheEv18gadwX_Lauhy0fyPHCCPi6A8ANCrPG3OOe4gTQAmaHcu2vqo5kanQ6ALFximZO4R-gHA9TH-">
-                                <div class="absolute top-3 left-3 flex gap-1">
-                                    <span class="px-2.5 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed-variant font-label-caps text-label-caps font-bold uppercase tracking-wider shadow-sm">Verified Atelier</span>
-                                </div>
-                                <div class="absolute top-3 right-3 px-2 py-0.5 rounded bg-surface-container-lowest/90 backdrop-blur font-title-sm text-title-sm text-on-surface flex items-center gap-1 shadow-sm">
-                                    <span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
-                                    <span>4.9</span>
-                                    <span class="text-on-surface-variant font-body-sm text-body-sm">(240)</span>
-                                </div>
-                            </div>
-                            <div class="p-space-lg flex flex-col">
-                                <div class="flex items-center justify-between mb-1">
-                                    <span class="font-label-caps text-label-caps text-primary uppercase tracking-wider">Cinematography &amp; Photo</span>
-                                    <div class="flex items-center gap-1 text-on-surface-variant font-body-sm text-body-sm">
-                                        <span class="material-symbols-outlined text-[14px]">location_on</span>
-                                        <span>Colombo 07</span>
-                                    </div>
-                                </div>
-                                <h3 class="font-headline-sm text-headline-sm text-on-background group-hover:text-primary transition-colors">Dhanushka Senanayake Fine Art</h3>
-                                <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 line-clamp-2">Pioneering destination and heritage Poruwa documentary photography with cinematic color grading.</p>
-                                <div class="flex flex-wrap gap-1.5 mt-space-md">
-                                    <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md">Cinematic</span>
-                                    <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md">Drone Poruwa</span>
-                                    <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md">Fine Art</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="px-space-lg pb-space-lg pt-space-sm flex items-center justify-between bg-surface-container-low/40 border-t border-outline-variant/10">
-                            <div class="flex flex-col">
-                                <span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Starting from</span>
-                                <span class="font-title-lg text-title-lg text-on-background font-bold tracking-tight">LKR 320,000</span>
-                            </div>
-                            <button class="quote-btn px-space-md py-2 rounded-lg bg-surface text-on-surface hover:bg-on-background hover:text-surface transition-all font-title-sm text-title-sm shadow-sm flex items-center gap-1 cursor-pointer" data-vendor="Dhanushka Senanayake Fine Art" type="button">
-                                <span>Quick Quote</span>
-                                <span class="material-symbols-outlined text-[16px]">send</span>
-                            </button>
-                        </div>
-                    </article>
-
-                    <!-- Card 3: Malka Bridal Atelier -->
-                    <article class="vendor-card group bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all flex flex-col justify-between border border-outline-variant/20" data-category="bridal" data-district="kandy">
-                        <div>
-                            <div class="relative aspect-[16/10] overflow-hidden bg-surface-container">
-                                <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Close up detail shot of hand-sewn real gold bullion embroidery on Kandyan Osariya saree" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6nBUoYHGWcOH-Ms4P-tHB9wY4ooFc_dzFK524Jv6zQ4fPp33y_L2IYuwOlkAehPICapiEHPww6i-XUOfl0L80chXY1LUXfnM7MmEAY8WvABWmiEMqbnYWmnqczEm_GIpWA8bqeqlCeHWREKZJ4Dz_2NaaSRac_l5MStNMe1UpjQleubtip4wz9ZGjsSO12p2Xmp5GWawbX774IK4ROwpyxOil1k5CyN1YOsc9I48P">
-                                <div class="absolute top-3 left-3 flex gap-1">
-                                    <span class="px-2.5 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-caps text-label-caps font-bold uppercase tracking-wider shadow-sm">Top Rated 2025</span>
-                                </div>
-                                <div class="absolute top-3 right-3 px-2 py-0.5 rounded bg-surface-container-lowest/90 backdrop-blur font-title-sm text-title-sm text-on-surface flex items-center gap-1 shadow-sm">
-                                    <span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
-                                    <span>4.9</span>
-                                    <span class="text-on-surface-variant font-body-sm text-body-sm">(160)</span>
-                                </div>
-                            </div>
-                            <div class="p-space-lg flex flex-col">
-                                <div class="flex items-center justify-between mb-1">
-                                    <span class="font-label-caps text-label-caps text-primary uppercase tracking-wider">Bridal &amp; Saree Draping</span>
-                                    <div class="flex items-center gap-1 text-on-surface-variant font-body-sm text-body-sm">
-                                        <span class="material-symbols-outlined text-[14px]">location_on</span>
-                                        <span>Kandy &amp; Colombo</span>
-                                    </div>
-                                </div>
-                                <h3 class="font-headline-sm text-headline-sm text-on-background group-hover:text-primary transition-colors">Malka Bridal Atelier (Kandyan &amp; Western)</h3>
-                                <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 line-clamp-2">Master stylist specializing in flawless royal Osariya pleating, antique 22K jewelry curation, and evening western transformations.</p>
-                                <div class="flex flex-wrap gap-1.5 mt-space-md">
-                                    <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md">Osariya Draping</span>
-                                    <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md">Gold Jewelry</span>
-                                    <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md">Hair Artistry</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="px-space-lg pb-space-lg pt-space-sm flex items-center justify-between bg-surface-container-low/40 border-t border-outline-variant/10">
-                            <div class="flex flex-col">
-                                <span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Starting from</span>
-                                <span class="font-title-lg text-title-lg text-on-background font-bold tracking-tight">LKR 180,000</span>
-                            </div>
-                            <button class="quote-btn px-space-md py-2 rounded-lg bg-surface text-on-surface hover:bg-on-background hover:text-surface transition-all font-title-sm text-title-sm shadow-sm flex items-center gap-1 cursor-pointer" data-vendor="Malka Bridal Atelier" type="button">
-                                <span>Quick Quote</span>
-                                <span class="material-symbols-outlined text-[16px]">send</span>
-                            </button>
-                        </div>
-                    </article>
-
-                    <!-- Card 4: Lassana Flora Poruwa Concepts -->
-                    <article class="vendor-card group bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all flex flex-col justify-between border border-outline-variant/20" data-category="poruwa" data-district="colombo">
-                        <div>
-                            <div class="relative aspect-[16/10] overflow-hidden bg-surface-container">
-                                <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Architectural wedding Poruwa carved with traditional lotus and swan motifs" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_Qa1TV4GRM08rC95X9ja7aUKnQGa2usfTOHOhLoyzk0x4277WOxNiZHtuxI7YNEAXu5V-PiIPIFs1JbKLuOC2xHw588KPITUNzDvxEcmE7BECSzD-qFJYZo88hAkGPicCBMvo2UuHFhYmwXklTrdqtlAB3jyjG68FVGVieFc5h4SS7kolLX3vXX2Y7Gn0X2XTmdsfKkw3J7EvTeRLFw-A8ntzxYvuIn3Ht31wVpUJ">
-                                <div class="absolute top-3 left-3 flex gap-1">
-                                    <span class="px-2.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-label-caps text-label-caps font-bold uppercase tracking-wider shadow-sm">Verified Atelier</span>
-                                </div>
-                                <div class="absolute top-3 right-3 px-2 py-0.5 rounded bg-surface-container-lowest/90 backdrop-blur font-title-sm text-title-sm text-on-surface flex items-center gap-1 shadow-sm">
-                                    <span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
-                                    <span>4.8</span>
-                                    <span class="text-on-surface-variant font-body-sm text-body-sm">(310)</span>
-                                </div>
-                            </div>
-                            <div class="p-space-lg flex flex-col">
-                                <div class="flex items-center justify-between mb-1">
-                                    <span class="font-label-caps text-label-caps text-primary uppercase tracking-wider">Floral &amp; Poruwa Decor</span>
-                                    <div class="flex items-center gap-1 text-on-surface-variant font-body-sm text-body-sm">
-                                        <span class="material-symbols-outlined text-[14px]">location_on</span>
-                                        <span>Colombo &amp; Islandwide</span>
-                                    </div>
-                                </div>
-                                <h3 class="font-headline-sm text-headline-sm text-on-background group-hover:text-primary transition-colors">Lassana Flora Bespoke Poruwa Concepts</h3>
-                                <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 line-clamp-2">Pioneering floral installations blending indigenous Ceylon botanical artistry with grandiose architectural Poruwa structures.</p>
-                                <div class="flex flex-wrap gap-1.5 mt-space-md">
-                                    <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md">Royal Poruwa</span>
-                                    <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md">Exotic Flora</span>
-                                    <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md">Set Design</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="px-space-lg pb-space-lg pt-space-sm flex items-center justify-between bg-surface-container-low/40 border-t border-outline-variant/10">
-                            <div class="flex flex-col">
-                                <span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Starting from</span>
-                                <span class="font-title-lg text-title-lg text-on-background font-bold tracking-tight">LKR 450,000</span>
-                            </div>
-                            <button class="quote-btn px-space-md py-2 rounded-lg bg-surface text-on-surface hover:bg-on-background hover:text-surface transition-all font-title-sm text-title-sm shadow-sm flex items-center gap-1 cursor-pointer" data-vendor="Lassana Flora Bespoke Poruwa Concepts" type="button">
-                                <span>Quick Quote</span>
-                                <span class="material-symbols-outlined text-[16px]">send</span>
-                            </button>
-                        </div>
-                    </article>
-
-                    <!-- Card 5: Naadro Traditional Drummers -->
-                    <article class="vendor-card group bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all flex flex-col justify-between border border-outline-variant/20" data-category="drummers" data-district="colombo">
-                        <div>
-                            <div class="relative aspect-[16/10] overflow-hidden bg-surface-container">
-                                <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Traditional Sri Lankan Kandyan drummers in ornate red and white headdresses playing Geta Bera drums" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkFLqLn70EsDEpsJ_1Z2o0CqeWdtwRb74tRLf4v7YEfaWknyobOe5nFYtVBQbHVLUjP22A9GBLo2HVY2eef4O9BdqMV_nwYW8_5pfk076ideLcFIrxlYiLs2jbQMnQaTtrTzl0SHLlKCnwYv8-vmsd0NnIkW7_dfMU04pAsF4Et_uyRyopbCFEbAaEjy0f5HQ6GDhbkQASBi3-1uTxCzL-BrwoNFSOoGj8tecHTiEc">
-                                <div class="absolute top-3 left-3 flex gap-1">
-                                    <span class="px-2.5 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed-variant font-label-caps text-label-caps font-bold uppercase tracking-wider shadow-sm">Heritage Master</span>
-                                </div>
-                                <div class="absolute top-3 right-3 px-2 py-0.5 rounded bg-surface-container-lowest/90 backdrop-blur font-title-sm text-title-sm text-on-surface flex items-center gap-1 shadow-sm">
-                                    <span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
-                                    <span>5.0</span>
-                                    <span class="text-on-surface-variant font-body-sm text-body-sm">(95)</span>
-                                </div>
-                            </div>
-                            <div class="p-space-lg flex flex-col">
-                                <div class="flex items-center justify-between mb-1">
-                                    <span class="font-label-caps text-label-caps text-primary uppercase tracking-wider">Cultural Arts &amp; Rituals</span>
-                                    <div class="flex items-center gap-1 text-on-surface-variant font-body-sm text-body-sm">
-                                        <span class="material-symbols-outlined text-[14px]">location_on</span>
-                                        <span>Islandwide Service</span>
-                                    </div>
-                                </div>
-                                <h3 class="font-headline-sm text-headline-sm text-on-background group-hover:text-primary transition-colors">Naadro Drummers &amp; Mangalam Troupe</h3>
-                                <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 line-clamp-2">Premier traditional percussionists, master Ashtaka chanters, and Jayamangala Gatha chorales for auspicious ceremony moments.</p>
-                                <div class="flex flex-wrap gap-1.5 mt-space-md">
-                                    <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md">Magul Bera</span>
-                                    <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md">Jayamangala Gatha</span>
-                                    <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md">Ashtaka</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="px-space-lg pb-space-lg pt-space-sm flex items-center justify-between bg-surface-container-low/40 border-t border-outline-variant/10">
-                            <div class="flex flex-col">
-                                <span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Starting from</span>
-                                <span class="font-title-lg text-title-lg text-on-background font-bold tracking-tight">LKR 125,000</span>
-                            </div>
-                            <button class="quote-btn px-space-md py-2 rounded-lg bg-surface text-on-surface hover:bg-on-background hover:text-surface transition-all font-title-sm text-title-sm shadow-sm flex items-center gap-1 cursor-pointer" data-vendor="Naadro Drummers & Mangalam Troupe" type="button">
-                                <span>Quick Quote</span>
-                                <span class="material-symbols-outlined text-[16px]">send</span>
-                            </button>
-                        </div>
-                    </article>
-
-                    <!-- Card 6: Galle Face Hotel Heritage Lawn -->
-                    <article class="vendor-card group bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all flex flex-col justify-between border border-outline-variant/20" data-category="venues" data-district="colombo">
-                        <div>
-                            <div class="relative aspect-[16/10] overflow-hidden bg-surface-container">
-                                <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Iconic oceanfront heritage lawn at the historic Galle Face Hotel" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdsIG4wd7s7fDT5Zw2AyWPEQI7EveL1VWXghUH1xztCSHHaptilyIfLAUXWvSyfccCmGIs3raA01QzlEgdb39CjVDmyhEJ6lOj6ujSrZy4uRdZh7XriRvQjwxJ0ysfHsJjzzuoB-zvYXkJ1fKxRrNdNqEjcp_BKr2ohxear6fISE7kqgKs6pJfssV49REmtxFV91KFdOktjWTJhd_avmQisLxzoNYKqRBUDPPbe9-k">
-                                <div class="absolute top-3 left-3 flex gap-1">
-                                    <span class="px-2.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-label-caps text-label-caps font-bold uppercase tracking-wider shadow-sm">Iconic Heritage</span>
-                                </div>
-                                <div class="absolute top-3 right-3 px-2 py-0.5 rounded bg-surface-container-lowest/90 backdrop-blur font-title-sm text-title-sm text-on-surface flex items-center gap-1 shadow-sm">
-                                    <span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
-                                    <span>4.9</span>
-                                    <span class="text-on-surface-variant font-body-sm text-body-sm">(215)</span>
-                                </div>
-                            </div>
-                            <div class="p-space-lg flex flex-col">
-                                <div class="flex items-center justify-between mb-1">
-                                    <span class="font-label-caps text-label-caps text-primary uppercase tracking-wider">Heritage Venues</span>
-                                    <div class="flex items-center gap-1 text-on-surface-variant font-body-sm text-body-sm">
-                                        <span class="material-symbols-outlined text-[14px]">location_on</span>
-                                        <span>Galle Face, Colombo</span>
-                                    </div>
-                                </div>
-                                <h3 class="font-headline-sm text-headline-sm text-on-background group-hover:text-primary transition-colors">Galle Face Hotel Heritage Lawn</h3>
-                                <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 line-clamp-2">Historic 1864 colonial grandeur paired with Sri Lanka's most sought-after Indian Ocean sunset lawn for outdoor vows and Poruwa rituals.</p>
-                                <div class="flex flex-wrap gap-1.5 mt-space-md">
-                                    <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md">Sunset Lawn</span>
-                                    <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md">Heritage Poruwa</span>
-                                    <span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md">Historic 1864</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="px-space-lg pb-space-lg pt-space-sm flex items-center justify-between bg-surface-container-low/40 border-t border-outline-variant/10">
-                            <div class="flex flex-col">
-                                <span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Starting from</span>
-                                <span class="font-title-lg text-title-lg text-on-background font-bold tracking-tight">LKR 650,000</span>
-                            </div>
-                            <button class="quote-btn px-space-md py-2 rounded-lg bg-surface text-on-surface hover:bg-on-background hover:text-surface transition-all font-title-sm text-title-sm shadow-sm flex items-center gap-1 cursor-pointer" data-vendor="Galle Face Hotel Heritage Lawn" type="button">
-                                <span>Quick Quote</span>
-                                <span class="material-symbols-outlined text-[16px]">send</span>
-                            </button>
-                        </div>
-                    </article>
+                    @endforelse
                 </div>
 
                 <!-- Browse all CTA button -->
@@ -842,48 +599,48 @@
             </section>
 
             <!-- Editorial Couple Testimonial Highlight -->
-            <section class="w-full max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-margin py-space-2xl">
-                <div class="relative bg-surface-container-lowest rounded-2xl p-space-xl md:p-space-2xl shadow-xl overflow-hidden border border-outline-variant/20">
-                    <!-- Decorative Backdrop Graphic -->
-                    <div class="absolute -right-16 -bottom-16 w-80 h-80 rounded-full bg-primary-fixed/20 blur-2xl pointer-events-none"></div>
+            @if(isset($featuredReview) && $featuredReview)
+                <section class="w-full max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-margin py-space-2xl">
+                    <div class="relative bg-surface-container-lowest rounded-2xl p-space-xl md:p-space-2xl shadow-xl overflow-hidden border border-outline-variant/20">
+                        <!-- Decorative Backdrop Graphic -->
+                        <div class="absolute -right-16 -bottom-16 w-80 h-80 rounded-full bg-primary-fixed/20 blur-2xl pointer-events-none"></div>
 
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-center">
-                        <div class="lg:col-span-4">
-                            <div class="relative aspect-square rounded-xl overflow-hidden shadow-md">
-                                <img class="w-full h-full object-cover" data-alt="Intimate portrait of an aristocratic Sri Lankan bride and groom laughing together at Cinnamon Grand Colombo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDy10efhekyW--9SNEgRnTPhsdZiEhAS0o4yY2fVEZKv0lZ30ySwa3sFcDLs5I4wJKrUNbK0-ZmUlUiJUzzhrwqLWYYcl1gly_2PVpC4UUBAXiPY3hvLA8m-PuzIWuiWxAmz0R2VmzRjZNSo5hwzwwmXaeyVwQJ0TXWBlzibeYLf0iX86t9ntjA8Jc5VOEBNzuWqUEKKrea8j5SJRqg-mwm5OQdFCTWJWAPiQVArOtS">
-                                <div class="absolute bottom-3 left-3 bg-surface-container-lowest/90 backdrop-blur px-space-sm py-1 rounded-full text-on-surface font-label-caps text-label-caps uppercase tracking-wider flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">favorite</span>
-                                    <span>Cinnamon Grand Nuptials</span>
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-center">
+                            <div class="lg:col-span-4">
+                                <div class="relative aspect-square rounded-xl overflow-hidden shadow-md">
+                                    <img class="w-full h-full object-cover" alt="Verified Wedora Nuptials" src="{{ $featuredReview->vendor?->coverMedia?->file_url ?? ($featuredReview->vendor?->media->first()?->file_url ?? 'https://lh3.googleusercontent.com/aida-public/AB6AXuDy10efhekyW--9SNEgRnTPhsdZiEhAS0o4yY2fVEZKv0lZ30ySwa3sFcDLs5I4wJKrUNbK0-ZmUlUiJUzzhrwqLWYYcl1gly_2PVpC4UUBAXiPY3hvLA8m-PuzIWuiWxAmz0R2VmzRjZNSo5hwzwwmXaeyVwQJ0TXWBlzibeYLf0iX86t9ntjA8Jc5VOEBNzuWqUEKKrea8j5SJRqg-mwm5OQdFCTWJWAPiQVArOtS') }}">
+                                    <div class="absolute bottom-3 left-3 bg-surface-container-lowest/90 backdrop-blur px-space-sm py-1 rounded-full text-on-surface font-label-caps text-label-caps uppercase tracking-wider flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">favorite</span>
+                                        <span>{{ $featuredReview->vendor?->business_name ?? 'Wedora Nuptials' }}</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="lg:col-span-8 flex flex-col items-start">
-                            <div class="flex items-center gap-1 text-primary mb-space-md">
-                                <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
-                            </div>
-                            <blockquote class="font-headline-md text-headline-md text-on-background italic leading-snug tracking-tight">
-                                “Wedora took all the chaos out of coordinating our astrologer's Nekath with our photographers and hotel banquet team. Having our Poruwa timeline and verified vendors in one spot made our wedding week completely blissful.”
-                            </blockquote>
-                            <div class="mt-space-lg flex flex-wrap items-center gap-space-md">
-                                <div>
-                                    <p class="font-title-lg text-title-lg text-on-background">Senesh &amp; Dilini</p>
-                                    <p class="font-body-sm text-body-sm text-on-surface-variant">Married at Cinnamon Grand Colombo • October 2024</p>
+                            <div class="lg:col-span-8 flex flex-col items-start">
+                                <div class="flex items-center gap-1 text-primary mb-space-md">
+                                    @for($i = 1; $i <= ($featuredReview->rating ?? 5); $i++)
+                                        <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                                    @endfor
                                 </div>
-                                <div class="h-8 w-px bg-surface-container-high mx-2 hidden sm:block"></div>
-                                <div class="flex items-center gap-1 text-tertiary font-label-caps text-label-caps uppercase">
-                                    <span class="material-symbols-outlined text-[16px]">verified</span>
-                                    <span>Verified Wedora Nuptials</span>
+                                <blockquote class="font-headline-md text-headline-md text-on-background italic leading-snug tracking-tight">
+                                    “{{ $featuredReview->comment }}”
+                                </blockquote>
+                                <div class="mt-space-lg flex flex-wrap items-center gap-space-md">
+                                    <div>
+                                        <p class="font-title-lg text-title-lg text-on-background">{{ $featuredReview->user?->name ?? 'Verified Wedora Couple' }}</p>
+                                        <p class="font-body-sm text-body-sm text-on-surface-variant">{{ $featuredReview->wedding?->title ?? 'Poruwa Ceremony & Reception' }} • {{ $featuredReview->created_at->format('F Y') }}</p>
+                                    </div>
+                                    <div class="h-8 w-px bg-surface-container-high mx-2 hidden sm:block"></div>
+                                    <div class="flex items-center gap-1 text-tertiary font-label-caps text-label-caps uppercase">
+                                        <span class="material-symbols-outlined text-[16px]">verified</span>
+                                        <span>Verified Wedora Client Review</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            @endif
 
             @if(isset($plans) && $plans->count())
                 <!-- Optional Verified Vendor Memberships / Subscription Atelier -->
@@ -950,8 +707,8 @@
                     </div>
                     <div class="flex flex-wrap items-center gap-space-md">
                         @auth
-                            <a class="px-space-xl py-3.5 rounded-lg bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container font-title-sm text-title-sm transition-all shadow-md" href="{{ route('workspace.dashboard') }}">
-                                Go To Planning Workspace
+                            <a class="px-space-xl py-3.5 rounded-lg bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container font-title-sm text-title-sm transition-all shadow-md" href="{{ $portalRoute }}">
+                                {{ $portalLabel }}
                             </a>
                         @else
                             <a class="px-space-xl py-3.5 rounded-lg bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container font-title-sm text-title-sm transition-all shadow-md" href="{{ route('register') }}">
@@ -984,7 +741,7 @@
             <form id="quote-form" onsubmit="handleQuoteSubmit(event)" class="space-y-3 font-body-sm">
                 <div>
                     <label class="font-title-sm text-title-sm text-on-surface block mb-1">Couple Name / Contact Person</label>
-                    <input type="text" required placeholder="e.g. Senesh & Dilini" class="w-full bg-surface border border-outline-variant/40 rounded-lg px-3 py-2 text-on-surface focus:outline-none focus:border-primary">
+                    <input type="text" required placeholder="e.g. Kasun & Dilini" class="w-full bg-surface border border-outline-variant/40 rounded-lg px-3 py-2 text-on-surface focus:outline-none focus:border-primary">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>

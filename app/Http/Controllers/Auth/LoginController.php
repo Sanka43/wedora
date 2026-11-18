@@ -34,9 +34,11 @@ class LoginController extends Controller
             $request->boolean('remember')
         );
 
-        // Check if redirect intended or parameter is provided
+        // Check if a safe internal redirect parameter is provided
         if ($redirect = $request->input('redirect')) {
-            return redirect($redirect);
+            if (is_string($redirect) && str_starts_with($redirect, '/') && !str_starts_with($redirect, '//') && !str_contains($redirect, '\\')) {
+                return redirect($redirect);
+            }
         }
 
         // Role-based routing
@@ -54,8 +56,18 @@ class LoginController extends Controller
         }
 
         if ($user->role === UserRole::Vendor) {
-            return redirect()->route('home')
-                ->with('success', __("Welcome back, :name! Vendor portal preview.", ['name' => $user->name]));
+            return redirect()->route('vendor.dashboard')
+                ->with('success', __("Welcome back, :name! Access your vendor leads and bookings.", ['name' => $user->name]));
+        }
+
+        if ($user->role === UserRole::SuperAdmin) {
+            return redirect()->route('admin.dashboard')
+                ->with('success', __("Welcome to Wedora Control Center, :name!", ['name' => $user->name]));
+        }
+
+        if ($user->role === UserRole::Planner) {
+            return redirect()->route('planner.dashboard')
+                ->with('success', __("Welcome back, :name! Access your client weddings portfolio.", ['name' => $user->name]));
         }
 
         return redirect()->intended(route('home'));

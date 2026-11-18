@@ -55,7 +55,7 @@ class EnsureWeddingContext
 
         // If wedding found, verify authorization & set context
         if ($wedding) {
-            $isMember = $user->isSuperAdmin() || WeddingMember::where('wedding_id', $wedding->id)
+            $isMember = $user->isSuperAdmin() || $user->isPlanner() || WeddingMember::where('wedding_id', $wedding->id)
                 ->where('user_id', $user->id)
                 ->where('invitation_status', InvitationStatus::Accepted)
                 ->exists();
@@ -84,6 +84,23 @@ class EnsureWeddingContext
             if ($user->isCouple() && !$request->routeIs('workspace.onboarding*') && !$request->routeIs('logout')) {
                 return redirect()->route('workspace.onboarding')
                     ->with('info', __('Please setup your wedding details to start planning.'));
+            }
+
+            // If non-couple user accesses workspace without an active wedding context
+            if (!$user->isCouple() && !$request->routeIs('logout')) {
+                if ($user->isVendor()) {
+                    return redirect()->route('vendor.dashboard')
+                        ->with('info', __('Manage your listings and client inquiries in the Vendor Portal.'));
+                }
+                if ($user->isSuperAdmin()) {
+                    return redirect()->route('admin.dashboard')
+                        ->with('info', __('Wedora platform administration and metrics.'));
+                }
+                if ($user->isPlanner()) {
+                    return redirect()->route('planner.dashboard')
+                        ->with('info', __('Manage assigned client weddings in the Planner Portal.'));
+                }
+                return redirect()->route('home');
             }
         }
 

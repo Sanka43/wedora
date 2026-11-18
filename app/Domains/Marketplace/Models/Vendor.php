@@ -74,6 +74,11 @@ class Vendor extends Model
         return $this->hasMany(VendorMedia::class);
     }
 
+    public function coverMedia()
+    {
+        return $this->hasOne(VendorMedia::class)->where('is_cover', true);
+    }
+
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);

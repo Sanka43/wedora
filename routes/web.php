@@ -1,8 +1,12 @@
 <?php
 
+use App\Domains\Booking\Enums\ReviewStatus;
+use App\Domains\Booking\Models\Review;
+use App\Domains\Marketplace\Models\Vendor;
 use App\Domains\Marketplace\Models\VendorCategory;
 use App\Domains\Planning\Models\ChecklistTemplate;
 use App\Domains\Platform\Models\SubscriptionPlan;
+use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\PasswordResetController;
@@ -12,6 +16,9 @@ use App\Http\Controllers\Couple\PartnerCollaborationController;
 use App\Http\Controllers\Couple\WeddingInvitationController;
 use App\Http\Controllers\Couple\WeddingOnboardingController;
 use App\Http\Controllers\Couple\WorkspaceDashboardController;
+use App\Http\Controllers\Marketplace\VendorProfileController;
+use App\Http\Controllers\Planner\PlannerDashboardController;
+use App\Http\Controllers\Vendor\VendorDashboardController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 
@@ -24,6 +31,8 @@ Route::get('/', function () {
     $categories = collect();
     $plans = collect();
     $templates = collect();
+    $featuredVendors = collect();
+    $featuredReview = null;
 
     if (Schema::hasTable('vendor_categories')) {
         $categories = VendorCategory::where('is_active', true)
@@ -43,7 +52,31 @@ Route::get('/', function () {
             ->get();
     }
 
-    return view('welcome', compact('categories', 'plans', 'templates'));
+    if (Schema::hasTable('vendors')) {
+        $featuredVendors = Vendor::where('is_active', true)
+            ->where('is_featured', true)
+            ->with(['category', 'media'])
+            ->orderByDesc('rating_avg')
+            ->take(6)
+            ->get();
+
+        if ($featuredVendors->isEmpty()) {
+            $featuredVendors = Vendor::where('is_active', true)
+                ->with(['category', 'media'])
+                ->take(6)
+                ->get();
+        }
+    }
+
+    if (Schema::hasTable('reviews')) {
+        $featuredReview = Review::with(['wedding', 'vendor', 'user'])
+            ->where('rating', 5)
+            ->where('status', ReviewStatus::Approved)
+            ->latest()
+            ->first();
+    }
+
+    return view('welcome', compact('categories', 'plans', 'templates', 'featuredVendors', 'featuredReview'));
 })->name('home');
 
 /*
@@ -126,6 +159,49 @@ Route::middleware(['auth', 'wedding.context'])->prefix('workspace')->name('works
     Route::put('/collaborators/members/{id}/permissions', [PartnerCollaborationController::class, 'updatePermissions'])->name('collaborators.permissions');
     Route::post('/switch/{uuid}', [PartnerCollaborationController::class, 'switchWedding'])->name('switch');
 });
+
+/*
+|--------------------------------------------------------------------------
+| Super Admin Control Center Routes
+|--------------------------------------------------------------------------
+*/
+Route::redirect('/admin', '/admin/dashboard');
+Route::middleware(['auth', 'role:super_admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Vendor Portal Routes
+|--------------------------------------------------------------------------
+*/
+Route::redirect('/vendor', '/vendor/dashboard');
+Route::prefix('vendor')->name('vendor.')->group(function () {
+    Route::get('/dashboard', [VendorDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/crew-brief', [VendorDashboardController::class, 'downloadCrewBrief'])->name('crew-brief');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Wedding Planner Portal Routes
+|--------------------------------------------------------------------------
+*/
+Route::redirect('/planner', '/planner/dashboard');
+Route::middleware(['auth', 'role:planner'])->prefix('planner')->name('planner.')->group(function () {
+    Route::get('/dashboard', [PlannerDashboardController::class, 'index'])->name('dashboard');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Marketplace & Vendor Profile Routes
+|--------------------------------------------------------------------------
+*/
+Route::get('/marketplace', fn () => redirect('/#marketplace-anchor'))->name('marketplace');
+Route::redirect('/onboarding', '/workspace/onboarding');
+Route::get('/vendors/{slug}', [VendorProfileController::class, 'show'])->name('vendors.show');
+Route::post('/vendors/{slug}/rfq', [VendorProfileController::class, 'storeRfq'])->name('vendors.rfq.store');
+Route::post('/vendors/{slug}/favorite', [VendorProfileController::class, 'toggleFavorite'])->name('vendors.favorite.toggle');
+Route::post('/vendors/{slug}/consultation', [VendorProfileController::class, 'scheduleConsultation'])->name('vendors.consultation.schedule');
 
 /*
 |--------------------------------------------------------------------------
