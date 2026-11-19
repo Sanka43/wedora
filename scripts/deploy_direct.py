@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import os
 import sys
+import time
 import ftplib
 import urllib.request
 import urllib.error
-import glob
 import posixpath
 
 def log(msg):
@@ -70,73 +70,102 @@ elif 'public_html' in root_items:
     else:
         ftp.cwd('..')
 
-log(f"Active Working Directory for Deployment: {ftp.pwd()}")
-active_items = ftp.nlst()
-log(f"Active directory items: {active_items}")
-
-def ensure_remote_dir(remote_path):
-    parts = remote_path.strip('/').split('/')
-    cur = ""
-    for part in parts:
-        if not part:
-            continue
-        cur += "/" + part
-        try:
-            ftp.mkd(part)
-        except Exception:
-            pass
-        try:
-            ftp.cwd(part)
-        except Exception:
-            pass
-    # return back to base
-    ftp.cwd(ftp_base_dir)
-
 ftp_base_dir = ftp.pwd()
+log(f"Active Working Directory for Deployment: {ftp_base_dir}")
+
+known_dirs = set()
+
+def enter_remote_dir(remote_dir):
+    ftp.cwd(ftp_base_dir)
+    if not remote_dir or remote_dir == '.':
+        return
+    parts = [p for p in remote_dir.strip('/').split('/') if p]
+    accum = ""
+    for part in parts:
+        accum = f"{accum}/{part}" if accum else part
+        if accum in known_dirs:
+            try:
+                ftp.cwd(part)
+            except Exception:
+                try:
+                    ftp.mkd(part)
+                except Exception:
+                    pass
+                ftp.cwd(part)
+        else:
+            try:
+                ftp.cwd(part)
+                known_dirs.add(accum)
+            except Exception:
+                try:
+                    ftp.mkd(part)
+                except Exception:
+                    pass
+                ftp.cwd(part)
+                known_dirs.add(accum)
 
 def upload_file(local_path, remote_path):
+    remote_path = remote_path.replace('\\', '/')
     remote_dir = posixpath.dirname(remote_path)
     remote_filename = posixpath.basename(remote_path)
-    
-    if remote_dir:
-        ensure_remote_dir(remote_dir)
-        ftp.cwd(remote_dir)
-    
-    with open(local_path, 'rb') as f:
-        log(f"Uploading: {local_path} -> {remote_path}")
-        ftp.storbinary(f"STOR {remote_filename}", f)
-    
-    ftp.cwd(ftp_base_dir)
 
-# 1. Upload critical views, configs, routes, scripts
-critical_files = [
-    'resources/views/welcome.blade.php',
-    'resources/css/app.css',
-    'routes/web.php',
-    'public/system-cache-clear.php',
-    'public/wedora-live-check.txt',
-    'public/robots.txt',
-    'public/index.php',
-]
-
-for cf in critical_files:
-    if os.path.exists(cf):
+    for attempt in range(2):
         try:
-            upload_file(cf, cf)
+            enter_remote_dir(remote_dir)
+            with open(local_path, 'rb') as f:
+                ftp.storbinary(f"STOR {remote_filename}", f)
+            ftp.cwd(ftp_base_dir)
+            return True
         except Exception as e:
-            log(f"Failed to upload {cf}: {e}")
+            ftp.cwd(ftp_base_dir)
+            if attempt == 0:
+                time.sleep(1)
+            else:
+                log(f"Failed to upload {remote_path}: {e}")
+                return False
 
-# 2. Upload public/build assets & manifest
-build_files = glob.glob('public/build/**', recursive=True)
-for bf in build_files:
-    if os.path.isfile(bf):
-        norm_bf = bf.replace('\\', '/')
-        try:
-            upload_file(norm_bf, norm_bf)
-        except Exception as e:
-            log(f"Failed to upload build asset {norm_bf}: {e}")
+def get_files_to_sync():
+    files = []
+    sync_dirs = ['app', 'bootstrap', 'config', 'database', 'public', 'resources', 'routes']
+    for d in sync_dirs:
+        if not os.path.isdir(d):
+            continue
+        for root, dirs, filenames in os.walk(d):
+            rel_root = os.path.relpath(root, '.').replace('\\', '/')
+            if rel_root.startswith('bootstrap/cache'):
+                continue
+            if rel_root.startswith('public/storage'):
+                continue
+            for f in filenames:
+                if f.startswith('.git') or f.endswith('.sqlite') or f.endswith('.sqlite-journal') or f.endswith('.sql'):
+                    continue
+                if f == '.phpunit.result.cache':
+                    continue
+                local_path = os.path.join(root, f)
+                rel_path = os.path.relpath(local_path, '.').replace('\\', '/')
+                files.append(rel_path)
+    root_files = ['artisan', 'composer.json', 'composer.lock']
+    for rf in root_files:
+        if os.path.isfile(rf):
+            files.append(rf)
+    return sorted(files)
 
-# 3. Clean server-side cached views in storage/framework/views
+# 1. Synchronize all project application files
+files_to_sync = get_files_to_sync()
+log(f"Synchronizing {len(files_to_sync)} application files to remote server...")
+
+uploaded_count = 0
+failed_count = 0
+for idx, fpath in enumerate(files_to_sync, 1):
+    ok = upload_file(fpath, fpath)
+    if ok:
+        uploaded_count += 1
+    else:
+        failed_count += 1
+    if idx % 25 == 0 or idx == len(files_to_sync):
+        log(f"Upload progress: {idx}/{len(files_to_sync)} files processed ({uploaded_count} uploaded, {failed_count} failed)")
+
+# 2. Clean server-side cached views in storage/framework/views
 try:
     log("Purging remote storage/framework/views/*.php...")
     ftp.cwd("storage/framework/views")
@@ -155,7 +184,7 @@ except Exception as e:
     log(f"Could not purge storage/framework/views: {e}")
     ftp.cwd(ftp_base_dir)
 
-# 4. Clean server-side bootstrap/cache/*.php
+# 3. Clean server-side bootstrap/cache/*.php
 try:
     log("Purging remote bootstrap/cache/*.php...")
     ftp.cwd("bootstrap/cache")
@@ -177,7 +206,7 @@ except Exception as e:
 ftp.quit()
 log("FTP transfer completed successfully.")
 
-# 5. Trigger Remote Cache Clear & OPcache Reset
+# 4. Trigger Remote Cache Clear & OPcache Reset
 clear_url = f"{app_url}/system-cache-clear.php?token={deploy_secret}"
 log(f"Triggering cache clear endpoint: {clear_url}")
 try:
